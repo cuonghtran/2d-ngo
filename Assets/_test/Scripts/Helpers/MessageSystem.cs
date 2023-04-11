@@ -1,4 +1,4 @@
-namespace tn2br
+namespace BasicNetcode
 {
     namespace Message
     {

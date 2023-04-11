@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace tn2br
+namespace BasicNetcode
 {
     public class CommonClass
     {
