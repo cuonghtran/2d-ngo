@@ -16,9 +16,10 @@ namespace BasicNetcode.Networking
         public static ServerGameNetPortal Instance => instance;
         private static ServerGameNetPortal instance;
 
-        private Dictionary<string, PlayerData> clientData;
-        private Dictionary<ulong, string> clientIdToGuid;
-        private Dictionary<ulong, int> clientSceneMap;
+        private Dictionary<string, PlayerData> _clientData;
+        public Dictionary<string, PlayerData> ClientData { get { return _clientData; } }
+        private Dictionary<ulong, string> _clientIdToGuid;
+        private Dictionary<ulong, int> _clientSceneMap;
         private bool gameInProgress;
 
         private const int MaxConnectionPayload = 1024;
@@ -45,9 +46,9 @@ namespace BasicNetcode.Networking
             NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
             NetworkManager.Singleton.OnServerStarted += HandleServerStarted;
 
-            clientData = new Dictionary<string, PlayerData>();
-            clientIdToGuid = new Dictionary<ulong, string>();
-            clientSceneMap = new Dictionary<ulong, int>();
+            _clientData = new Dictionary<string, PlayerData>();
+            _clientIdToGuid = new Dictionary<ulong, string>();
+            _clientSceneMap = new Dictionary<ulong, int>();
         }
 
         private void OnDestroy()
@@ -64,9 +65,9 @@ namespace BasicNetcode.Networking
 
         public PlayerData? GetPlayerData(ulong clientId)
         {
-            if (clientIdToGuid.TryGetValue(clientId, out string clientGuid))
+            if (_clientIdToGuid.TryGetValue(clientId, out string clientGuid))
             {
-                if (clientData.TryGetValue(clientGuid, out PlayerData playerData))
+                if (_clientData.TryGetValue(clientGuid, out PlayerData playerData))
                 {
                     return playerData;
                 }
@@ -109,21 +110,21 @@ namespace BasicNetcode.Networking
 
             if (NetworkManager.Singleton.IsHost)
             {
-                clientSceneMap[NetworkManager.Singleton.LocalClientId] = SceneManager.GetActiveScene().buildIndex;
+                _clientSceneMap[NetworkManager.Singleton.LocalClientId] = SceneManager.GetActiveScene().buildIndex;
             }
         }
 
         private void HandleClientDisconnect(ulong clientId)
         {
-            clientSceneMap.Remove(clientId);
+            _clientSceneMap.Remove(clientId);
 
-            if (clientIdToGuid.TryGetValue(clientId, out string guid))
+            if (_clientIdToGuid.TryGetValue(clientId, out string guid))
             {
-                clientIdToGuid.Remove(clientId);
+                _clientIdToGuid.Remove(clientId);
 
-                if (clientData[guid].ClientId == clientId)
+                if (_clientData[guid].ClientId == clientId)
                 {
-                    clientData.Remove(guid);
+                    _clientData.Remove(guid);
                 }
             }
 
@@ -137,7 +138,7 @@ namespace BasicNetcode.Networking
 
         private void HandleClientSceneChanged(ulong clientId, int sceneIndex)
         {
-            clientSceneMap[clientId] = sceneIndex;
+            _clientSceneMap[clientId] = sceneIndex;
         }
 
         private void HandleUserDisconnectRequested()
@@ -158,15 +159,15 @@ namespace BasicNetcode.Networking
             string clientGuid = Guid.NewGuid().ToString();
             string playerName = PlayerPrefs.GetString("PlayerName", "Missing Name");
 
-            clientData.Add(clientGuid, new PlayerData(playerName, NetworkManager.Singleton.LocalClientId));
-            clientIdToGuid.Add(NetworkManager.Singleton.LocalClientId, clientGuid);
+            _clientData.Add(clientGuid, new PlayerData(playerName, NetworkManager.Singleton.LocalClientId));
+            _clientIdToGuid.Add(NetworkManager.Singleton.LocalClientId, clientGuid);
         }
 
         private void ClearData()
         {
-            clientData.Clear();
-            clientIdToGuid.Clear();
-            clientSceneMap.Clear();
+            _clientData.Clear();
+            _clientIdToGuid.Clear();
+            _clientSceneMap.Clear();
 
             gameInProgress = false;
         }
@@ -214,16 +215,16 @@ namespace BasicNetcode.Networking
             {
                 gameReturnStatus = ConnectStatus.GameInProgress;
             }
-            else if (clientData.Count >= maxPlayers)
+            else if (_clientData.Count >= maxPlayers)
             {
                 gameReturnStatus = ConnectStatus.ServerFull;
             }
 
             if (gameReturnStatus == ConnectStatus.Success)
             {
-                clientSceneMap[clientId] = connectionPayload.clientScene;
-                clientIdToGuid[clientId] = connectionPayload.clientGUID;
-                clientData[connectionPayload.clientGUID] = new PlayerData(connectionPayload.playerName, clientId);
+                _clientSceneMap[clientId] = connectionPayload.clientScene;
+                _clientIdToGuid[clientId] = connectionPayload.clientGUID;
+                _clientData[connectionPayload.clientGUID] = new PlayerData(connectionPayload.playerName, clientId);
             }
 
             response.CreatePlayerObject = false;

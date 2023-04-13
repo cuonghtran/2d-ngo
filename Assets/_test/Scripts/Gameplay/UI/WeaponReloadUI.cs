@@ -8,6 +8,9 @@ namespace BasicNetcode
     {
         [SerializeField] private Image reloadFillImage;
 
+        [Header("Events")]
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloadingEvent;
+
         private CanvasGroup canvasGroup;
 
         private void Start()
@@ -15,7 +18,17 @@ namespace BasicNetcode
             canvasGroup = GetComponent<CanvasGroup>();
         }
 
-        public void ReloadWeaponUI(PlayerWeapons playerWeapons)
+        private void OnEnable()
+        {
+            _onWeaponReloadingEvent.OnEventRaised += ReloadWeaponUI;
+        }
+
+        private void OnDisable()
+        {
+            _onWeaponReloadingEvent.OnEventRaised -= ReloadWeaponUI;
+        }
+
+        private void ReloadWeaponUI(PlayerWeapons playerWeapons)
         {
             float reloadTime = playerWeapons.GetActiveWeapon().ReloadTime;
             StartCoroutine(UpdateReloadBar(reloadTime));

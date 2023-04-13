@@ -1,10 +1,12 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
+using Unity.Netcode;
 
 namespace BasicNetcode
 {
-    public class PlayerWeapons : MonoBehaviour
+    public class PlayerWeapons : NetworkBehaviour
     {
         public enum WeaponSlot
         {
@@ -12,18 +14,26 @@ namespace BasicNetcode
             Second = 1,
             Third = 2
         }
+        [Header("References")]
         public Weapon[] equippedWeapons = new Weapon[3];
+        public Weapon weaponToBePickedup;
         [SerializeField] private Transform[] _weaponSlots;
         [SerializeField] private Weapon activeWeapon;
         [SerializeField] private int activeWeaponIndex = -1;
         [SerializeField] private Animator _knifeAnimator;
 
-        private bool onCooldown;
+        [Header("Events")]
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChangedEvent;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedupEvent;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloadingEvent;
+
+        private bool _onCooldown;
         private string _knifeWeaponName = "Knife";
         private float _knifeCooldown = 0.5f;
+        private float _weaponCooldownTime = 0f;
         private int _hashKnifeAttack = Animator.StringToHash("Knife_Attack");
 
-        public UnityEvent OnChangeWeapon, OnPickupWeapon, OnReload;
+        public static Action<int> OnAmmoChanged;
 
         // Start is called before the first frame update
         void Start()
@@ -31,7 +41,7 @@ namespace BasicNetcode
             if (activeWeapon)
             {
                 Equip(activeWeapon, false);
-                OnPickupWeapon.Invoke();
+                _onWeaponPickedupEvent.RaiseEvent(this);
             }
         }
 
@@ -40,6 +50,7 @@ namespace BasicNetcode
         {
             ChangeWeapon();
             StartCoroutine(ReloadActiveWeapon());
+            FireWeapon();
         }
 
         void ChangeWeapon()
@@ -57,60 +68,47 @@ namespace BasicNetcode
             }
         }
 
+        private void FireWeapon()
+        {
+            if (activeWeapon && !_onCooldown && !activeWeapon.IsReloading)
+            {
+                if (Input.GetMouseButton(0))
+                {
+                    if (activeWeapon.slot == WeaponSlot.Third && activeWeapon.name == _knifeWeaponName)
+                    {
+                        _knifeAnimator.SetTrigger(_hashKnifeAttack);
+                        StartCoroutine(ReloadKnife());
+                    }
+                    else
+                    {
+                        if (Time.time >= _weaponCooldownTime)
+                        {
+                            _weaponCooldownTime = Time.time + activeWeapon.WeaponCooldown;
+                            activeWeapon.ReduceAmmo();
+                            GUIManager.Instance.UpdateAmmoUI(activeWeapon.AmmoCount);
+                            activeWeapon.OnFireBullets();
+                        }
+                    }
+                }
+            }
+        }
+
         IEnumerator ReloadActiveWeapon()
         {
             if (activeWeapon && (Input.GetKeyDown(KeyCode.R) || activeWeapon.CheckOutOfAmmo()))
             {
                 if (activeWeapon.slot != WeaponSlot.Third) // don't reload third weapons
                 {
-                    activeWeapon.StopFiring();
-                    OnReload.Invoke();
+                    _onWeaponReloadingEvent.RaiseEvent(this);
                     yield return StartCoroutine(activeWeapon.Reload());
                     GUIManager.Instance.UpdateAmmoUI(activeWeapon.AmmoCount);
                 }
             }
         }
 
-        void LateUpdate()
-        {
-            if (activeWeapon)
-            {
-                if (!onCooldown && !activeWeapon.IsReloading)
-                {
-                    // if active weapon is a knife
-                    if (activeWeapon.slot == WeaponSlot.Third && activeWeapon.name == _knifeWeaponName)
-                    {
-                        if (Input.GetMouseButtonDown(0))
-                        {
-                            _knifeAnimator.SetTrigger(_hashKnifeAttack);
-                            StartCoroutine(ReloadKnife());
-                        }
-                    }
-                    else
-                    {
-                        if (Input.GetMouseButtonDown(0))
-                        {
-                            activeWeapon.StartFiring();
-                        }
-
-                        if (activeWeapon.IsFiring)
-                        {
-                            activeWeapon.UpdateFiring(Time.deltaTime);
-                            GUIManager.Instance.UpdateAmmoUI(activeWeapon.AmmoCount);
-                        }
-
-                        if (Input.GetMouseButtonUp(0))
-                        {
-                            activeWeapon.StopFiring();
-                        }
-                    }
-                }
-            }
-        }
-
         IEnumerator ReloadKnife()
         {
-            onCooldown = true;
+            _onCooldown = true;
 
             float elapsedTime = 0;
             while (elapsedTime <= _knifeCooldown)
@@ -119,7 +117,7 @@ namespace BasicNetcode
                 yield return null;
             }
 
-            onCooldown = false;
+            _onCooldown = false;
         }
 
         Weapon GetWeaponByIndex(int index)
@@ -164,11 +162,10 @@ namespace BasicNetcode
 
         IEnumerator HolsterWeapon(int index)
         {
-            onCooldown = true;
+            _onCooldown = true;
             var weapon = GetWeaponByIndex(index);
             if (weapon)
             {
-                weapon.SetWeaponHolstered(true);
                 weapon.gameObject.SetActive(false);
                 yield return new WaitForSeconds(0.1f);
             }
@@ -182,8 +179,7 @@ namespace BasicNetcode
                 activeWeapon = weapon;
                 weapon.gameObject.SetActive(true);
                 yield return new WaitForSeconds(0.05f);
-                onCooldown = false;
-                weapon.SetWeaponHolstered(false);
+                _onCooldown = false;
                 GUIManager.Instance.UpdateAmmoUI(weapon.AmmoCount);
             }
         }
@@ -194,8 +190,8 @@ namespace BasicNetcode
             yield return StartCoroutine(ActivateWeapon(activateIndex));
             activeWeaponIndex = activateIndex;
             if (isPickup)
-                OnPickupWeapon.Invoke();
-            else OnChangeWeapon.Invoke();
+                _onWeaponPickedupEvent.RaiseEvent(this);
+            else _onWeaponChangedEvent.RaiseEvent(this);
         }
     }
 }

@@ -8,16 +8,20 @@ namespace BasicNetcode
     {
         [Header("References")]
         [SerializeField] private Weapon weaponToBePickedUp;
-        public Transform weaponTransform;
+        [SerializeField] private Transform weaponTransform;
         [SerializeField] private Weapon.Rarity rarity;
-        public GameObject InteractCanvas;
+        [SerializeField] private GameObject InteractCanvas;
+
+        [Header("Floating values")]
+        [SerializeField] private float amplitude = 0.5f;
+        [SerializeField] private float frequency = 1f;
+        private Vector2 tempPos = new Vector2();
 
         private bool isTriggered = false;
         private bool isLooted = false;
         private Transform triggerTransform;
         private Vector3 topPosition;
         private Vector3 bottomPosition;
-        private float floatSpeed = 0.09f;
         private bool goingForward = true;
 
         // Start is called before the first frame update
@@ -32,19 +36,9 @@ namespace BasicNetcode
         void Update()
         {
             // make the weapon transform floating
-            if (topPosition != Vector3.zero && bottomPosition != Vector3.zero)
-            {
-                if (goingForward)
-                    weaponTransform.position = Vector3.MoveTowards(weaponTransform.position, bottomPosition, floatSpeed * Time.deltaTime);
-                else if (!goingForward)
-                    weaponTransform.position = Vector3.MoveTowards(weaponTransform.position, topPosition, floatSpeed * Time.deltaTime);
-
-                if (Vector3.Distance(weaponTransform.position, bottomPosition) <= 0.0001f && goingForward)
-                    StartCoroutine(SwitchDirection());
-
-                if (Vector3.Distance(weaponTransform.position, topPosition) <= 0.0001f && !goingForward)
-                    StartCoroutine(SwitchDirection());
-            }
+            tempPos = transform.position;
+            tempPos.y += Mathf.Sin(Time.fixedTime * Mathf.PI * frequency) * amplitude;
+            transform.position = tempPos;
 
             // a player in the trigger zone
             if (isTriggered && !isLooted)

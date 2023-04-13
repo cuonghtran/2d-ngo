@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,11 +18,17 @@ namespace BasicNetcode
             public bool stopCamera;
         }
 
+        [Header("References")]
+        [SerializeField] private PlayerUiController _playerUiController;
+
+        [Header("Events")]
+        [SerializeField] private FloatEventChannelSo _onDamageReceivedEvent;
+
         public float maxHitPoints;
         public float currentHitPoints { get; set; }
         public float maxArmor;
         public float currentArmor { get; set; }
-        public float invulnerabilityTime = 0f;
+        public float invulnerabilityTime = 0.25f;
         public bool isInvulnerable { get; set; }
 
         public UnityEvent OnDeath, OnReceiveDamage, OnBecomeVulnerable, OnResetDamage;
@@ -85,8 +92,7 @@ namespace BasicNetcode
             if (currentHitPoints <= 0 || isInvulnerable)
                 return;
 
-            // isInvulnerable = true;  // enable this line if want to make player invul after getting hit.
-            // currentHitPoints -= data.amount;
+            isInvulnerable = true;  // enable this line if want to make player invul after getting hit.
             CalculateDamageDone(data.amount);
 
             if (currentHitPoints <= 0)

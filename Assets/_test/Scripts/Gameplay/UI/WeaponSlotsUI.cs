@@ -5,8 +5,26 @@ namespace BasicNetcode
 {
     public class WeaponSlotsUI : MonoBehaviour
     {
-        float originPosY = 0;
-        float posYChange = 25;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChangedEvent;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedupEvent;
+
+        float _transitionTime = 0.15f;
+        float _activateAlpha = 0.85f;
+        float _deactivateAlpha = 0.6f;
+        float _originPosY = 0;
+        float _posYChange = 3;
+
+        private void OnEnable()
+        {
+            _onWeaponChangedEvent.OnEventRaised += UpdateActiveSlotUI;
+            _onWeaponPickedupEvent.OnEventRaised += UpdateActiveSlotWhenPickupUI;
+        }
+
+        private void OnDisable()
+        {
+            _onWeaponChangedEvent.OnEventRaised -= UpdateActiveSlotUI;
+            _onWeaponPickedupEvent.OnEventRaised -= UpdateActiveSlotWhenPickupUI;
+        }
 
         private Weapon[] equippedWeapons = new Weapon[3];
 
@@ -17,8 +35,8 @@ namespace BasicNetcode
             foreach (RectTransform rect in transform)
             {
                 if (rect.GetSiblingIndex() == activeSlot)
-                    rect.DOMoveY(posYChange, 0.25f).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = 0.9f);
-                else rect.DOMoveY(originPosY, 0.25f).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = 0.65f);
+                    rect.DOLocalMoveY(_posYChange, _transitionTime).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = _activateAlpha);
+                else rect.DOLocalMoveY(_originPosY, _transitionTime).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = _deactivateAlpha);
             }
         }
 
@@ -38,8 +56,8 @@ namespace BasicNetcode
                 }
 
                 if (wpIndex == activeSlot)
-                    rect.DOMoveY(posYChange, 0.25f).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = 0.9f);
-                else rect.DOMoveY(originPosY, 0.25f).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = 0.65f);
+                    rect.DOLocalMoveY(_posYChange, _transitionTime).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = _activateAlpha);
+                else rect.DOLocalMoveY(_originPosY, _transitionTime).OnComplete(() => rect.GetComponent<CanvasGroup>().alpha = _deactivateAlpha);
             }
 
         }

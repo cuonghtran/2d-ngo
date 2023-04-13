@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 766686878170144972}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3745, y: 0.0634, z: 0}
+  m_LocalPosition: {x: 0.435, y: 0.0634, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -48,8 +48,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43853f88486d04b26b256f4e9d5c0afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 16
-  lifeTime: 0.9
+  speed: 20
+  lifeTime: 0.7
   size: 0.25
   spreadAngle: 1.25
   damageAmount: 18
@@ -4865,8 +4865,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: -1
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -4971,7 +4971,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1939354151
+  m_SortingLayerID: -371754787
   m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: -8557924086428254485, guid: 818d246a964c747c9ab6409fd3ff24d1, type: 3}
@@ -5002,8 +5002,9 @@ MonoBehaviour:
   rarity: 0
   ammoCount: 0
   clipSize: 12
-  fireRate: 2.5
+  fireRate: 3.5
   reloadTime: 0.6
+  playerOwner: 
   bulletParticle: {fileID: 1325109969701760493}
 --- !u!1 &2470237137478711974
 GameObject:
@@ -5075,8 +5076,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 2
   m_Sprite: {fileID: -5433928316579720958, guid: b262c243059484a7081595b35e024a09, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -9929,8 +9930,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -14801,8 +14802,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0

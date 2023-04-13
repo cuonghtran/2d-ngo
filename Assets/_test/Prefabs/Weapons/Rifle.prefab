@@ -70,8 +70,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 2
   m_Sprite: {fileID: -5354281591997313334, guid: b262c243059484a7081595b35e024a09, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -4924,8 +4924,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -9796,8 +9796,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -9877,8 +9877,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43853f88486d04b26b256f4e9d5c0afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 17
-  lifeTime: 1
+  speed: 22
+  lifeTime: 0.8
   size: 0.23
   spreadAngle: 1.75
   damageAmount: 10
@@ -14694,8 +14694,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: -1
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -14800,7 +14800,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1939354151
+  m_SortingLayerID: -371754787
   m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 971002328043318722, guid: 818d246a964c747c9ab6409fd3ff24d1, type: 3}
@@ -14831,6 +14831,7 @@ MonoBehaviour:
   rarity: 0
   ammoCount: 0
   clipSize: 30
-  fireRate: 8
+  fireRate: 10
   reloadTime: 0.9
+  playerOwner: 
   bulletParticle: {fileID: 4427444988556312437}

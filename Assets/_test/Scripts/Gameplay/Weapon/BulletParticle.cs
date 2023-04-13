@@ -7,20 +7,20 @@ namespace BasicNetcode
     public class BulletParticle : MonoBehaviour
     {
         [Header("Bullet Properties")]
-        [Range(15, 30)]
+        [Range(10, 40)]
         [SerializeField] private float speed = 15f;
-        [Range(0.5f, 2.5f)]
+        [Range(0.1f, 2.5f)]
         [SerializeField] private float lifeTime = 1f;
         [Range(0.1f, 1f)]
         [SerializeField] private float size = 0.2f;
         [Range(0.5f, 25f)]
         [SerializeField] private float spreadAngle = 1f;
-        [Range(5f, 40f)]
+        [Range(5f, 50f)]
         [SerializeField] private float damageAmount = 5f;
 
         [SerializeField] private bool isBurstWeapon;
-
         [SerializeField] Weapon bulletForWeapon;
+        private string _playerOwner;
 
         private ParticleSystem _particleSystem;
         private List<ParticleCollisionEvent> collisionEvents;
@@ -50,12 +50,22 @@ namespace BasicNetcode
             shapePS.angle = spreadAngle;
         }
 
+        public void SetParticleOwner(string ownerName)
+        {
+            _playerOwner = ownerName;
+        }
+
         void OnParticleCollision(GameObject other)
         {
             int numCollisionEvents = _particleSystem.GetCollisionEvents(other, collisionEvents);
 
             for (int i = 0; i < numCollisionEvents; i++)
             {
+                // Collision impulse
+                var rb = other.GetComponent<Rigidbody2D>();
+                if (rb != null)
+                    rb.AddForceAtPosition(other.transform.position - transform.position * 5, transform.position, ForceMode2D.Impulse);
+
                 SendDamageMessage(other);
             }
         }
@@ -75,7 +85,6 @@ namespace BasicNetcode
             };
 
             d.ApplyDamage(msg);
-            Debug.Log("collide");
         }
     }
 }

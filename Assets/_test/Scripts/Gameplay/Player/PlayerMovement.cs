@@ -1,6 +1,7 @@
 using UnityEngine;
 using BasicNetcode.Message;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace BasicNetcode
 {
@@ -16,6 +17,7 @@ namespace BasicNetcode
         private PlayerAim _playerAim;
         private SpriteRenderer _renderer;
         private Damageable _damageable;
+        private NetworkTransform _networkTransform;
 
         private enum MoveState { Normal, Rolling }
 
@@ -31,45 +33,44 @@ namespace BasicNetcode
 
         public override void OnNetworkSpawn()
         {
-            if (!IsOwner || !IsClient) return;
-
             _rigidBody = GetComponent<Rigidbody2D>();
             _animator = GetComponent<Animator>();
             _playerAim = GetComponent<PlayerAim>();
             _renderer = transform.GetComponent<SpriteRenderer>();
+            _networkTransform = GetComponent<NetworkTransform>();
             _damageable = GetComponent<Damageable>();
             _damageable.onDamageMessageReceivers.Add(this);
             _damageable.isInvulnerable = true;
         }
 
         // Update is called once per frame
-        void Update()
+        private void Update()
         {
-            if (!IsLocalPlayer) return;
+            if (!IsLocalPlayer)
+                return;
 
             MovementHandler();
             Animate();
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            if (!IsLocalPlayer) return;
-            
-            switch(_moveState)
+            if (IsServer)
             {
-                case MoveState.Normal:
-                    Debug.Log($"move: {_movementDirection * _movementSpeed * _speed * Time.deltaTime}");
-                    _rigidBody.velocity = _movementDirection * _movementSpeed * _speed * Time.deltaTime;
-                    break;
+                switch (_moveState)
+                {
+                    case MoveState.Normal:
+                        _rigidBody.velocity = _movementDirection * _movementSpeed * _speed * Time.deltaTime;
+                        break;
 
-                case MoveState.Rolling:
-                    _rigidBody.velocity = _movementDirection * _movementSpeed * _rollSpeed * Time.deltaTime;
-                    break;
+                    case MoveState.Rolling:
+                        _rigidBody.velocity = _movementDirection * _movementSpeed * _rollSpeed * Time.deltaTime;
+                        break;
+                }
             }
-            
         }
 
-        void MovementHandler()
+        private void MovementHandler()
         {
             if (_externalInputBlocked)
             {
@@ -85,7 +86,7 @@ namespace BasicNetcode
 
                     if (Input.GetKeyDown(KeyCode.LeftShift))
                     {
-                        _rollSpeed = _speed * 6; // starting value of roll speed
+                        _rollSpeed = _speed * 5; // starting value of roll speed
                         _animator.SetBool("IsRolling", true);
                         _moveState = MoveState.Rolling;
                     }
@@ -94,15 +95,14 @@ namespace BasicNetcode
 
                 case MoveState.Rolling:
                     _rollSpeed -= _rollSpeed * _rollSpeedDropMultiplier * Time.deltaTime;
-                    float rollSpeedMinimum = 100f;
-                    if (_rollSpeed < rollSpeedMinimum)
+                    if (_rollSpeed <= _speed)
                     {
                         _animator.SetBool("IsRolling", false);
                         _moveState = MoveState.Normal;
                     }
                     break;
             }
-            
+            UpdateClientMovementServerRpc(_movementDirection, _movementSpeed, _moveState, _rollSpeed);
 
             // TEST DAMAGE
             //if (Input.GetKeyDown(KeyCode.V))
@@ -119,9 +119,19 @@ namespace BasicNetcode
             //}
         }
 
-        void Animate()
+        [ServerRpc]
+        private void UpdateClientMovementServerRpc(Vector2 moveDirection, float moveSpeed, MoveState moveState, float rollSpeed)
+        {
+            _movementDirection = moveDirection;
+            _movementSpeed = moveSpeed;
+            _rollSpeed = rollSpeed;
+            _moveState = moveState;
+        }
+
+        private void Animate()
         {
             _aimAngle = _playerAim.aimAngle;
+
             if (-45 < _aimAngle && _aimAngle <= 45) // face right
             {
                 _animator.SetFloat(_hashHorizontal, 1);
@@ -141,6 +151,39 @@ namespace BasicNetcode
                 _renderer.sortingOrder = 0;
             }
             else if (135 < _aimAngle || _aimAngle <= -135) // face left
+            {
+                _animator.SetFloat(_hashHorizontal, -1);
+                _animator.SetFloat(_hashVertical, 0);
+                _renderer.sortingOrder = 0;
+            }
+
+            _animator.SetFloat(_hashSpeed, _movementSpeed);
+
+            UpdateClientAnimationServerRpc(_aimAngle);
+        }
+
+        [ServerRpc]
+        private void UpdateClientAnimationServerRpc(float aimAngle)
+        {
+            if (-45 < aimAngle && aimAngle <= 45) // face right
+            {
+                _animator.SetFloat(_hashHorizontal, 1);
+                _animator.SetFloat(_hashVertical, 0);
+                _renderer.sortingOrder = 0;
+            }
+            else if (45 < aimAngle && aimAngle <= 135) // face up
+            {
+                _animator.SetFloat(_hashHorizontal, 0);
+                _animator.SetFloat(_hashVertical, 1);
+                _renderer.sortingOrder = 3;
+            }
+            else if (-135 < aimAngle && aimAngle <= -45) // face down
+            {
+                _animator.SetFloat(_hashHorizontal, 0);
+                _animator.SetFloat(_hashVertical, -1);
+                _renderer.sortingOrder = 0;
+            }
+            else if (135 < aimAngle || aimAngle <= -135) // face left
             {
                 _animator.SetFloat(_hashHorizontal, -1);
                 _animator.SetFloat(_hashVertical, 0);

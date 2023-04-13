@@ -73,7 +73,7 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -1939354151
+  m_SortingLayerID: -371754787
   m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: -5509982826441475995, guid: 818d246a964c747c9ab6409fd3ff24d1, type: 3}
@@ -104,8 +104,9 @@ MonoBehaviour:
   rarity: 0
   ammoCount: 0
   clipSize: 4
-  fireRate: 1.4
+  fireRate: 2
   reloadTime: 0.75
+  playerOwner: 
   bulletParticle: {fileID: 5981926842328197814}
 --- !u!1 &2977845464456477378
 GameObject:
@@ -177,8 +178,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 2
   m_Sprite: {fileID: -8769953933402126363, guid: b262c243059484a7081595b35e024a09, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -5030,8 +5031,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -9903,8 +9904,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
@@ -9984,8 +9985,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43853f88486d04b26b256f4e9d5c0afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 18
-  lifeTime: 0.5
+  speed: 24
+  lifeTime: 0.3
   size: 0.18
   spreadAngle: 23
   damageAmount: 5
@@ -14801,8 +14802,8 @@ ParticleSystemRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1677283775
-  m_SortingLayer: 0
+  m_SortingLayerID: -371754787
+  m_SortingLayer: 2
   m_SortingOrder: -1
   m_RenderMode: 0
   m_MeshDistribution: 0
