@@ -21,6 +21,7 @@ namespace BasicNetcode
 
         [Header("References")]
         [SerializeField] private PlayerUiController _playerUiController;
+        [SerializeField] private GameObject _damagePopupPrefab;
 
         [Header("Events")]
         [SerializeField] private HitPointsEventChannelSo _onHitPointsChanged;
@@ -79,9 +80,10 @@ namespace BasicNetcode
                 return;
 
             CalculateDamageDone(data.amount);
+            TargetShowDamagePopupText(data.amount);
         }
 
-        void CalculateDamageDone(float amount)
+        private void CalculateDamageDone(float amount)
         {
             if (amount <= currentArmor)  // when the damage is less than current armor
             {
@@ -94,6 +96,15 @@ namespace BasicNetcode
                 currentHealth = Mathf.Max(currentHealth - leftAmt, 0);
             }
             _onHitPointsChanged.RaiseEvent(currentHealth, currentArmor);
+        }
+
+        private void TargetShowDamagePopupText(float dmg)
+        {
+            var topMostPos = transform.GetComponent<SpriteRenderer>().bounds.size.y / 2;
+            Vector3 dmgPos = new Vector3(transform.position.x, transform.position.y + topMostPos, transform.position.z);
+
+            var dmgText = Instantiate(_damagePopupPrefab, dmgPos, Quaternion.identity);
+            dmgText.GetComponent<DamagePopup>().SetUp(dmg, true);
         }
     }
 

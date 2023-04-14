@@ -491,6 +491,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerUiController: {fileID: 4083264133321917218}
+  _damagePopupPrefab: {fileID: 6477372396473653176, guid: a1e0a961c5a984c67bd45444fc02ab19, type: 3}
   _onHitPointsChanged: {fileID: 11400000, guid: ae83fd70b81e7c0469d7c83a6cf4e306, type: 2}
   maxHealth: 100
   maxArmor: 50
@@ -1141,7 +1142,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: -371754787
-  m_SortingOrder: 10
+  m_SortingOrder: 5
   m_TargetDisplay: 0
 --- !u!114 &3583840262435348039
 MonoBehaviour:
