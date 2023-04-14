@@ -69,7 +69,7 @@ namespace BasicNetcode
                 var networkObj = playerObject.GetComponent<NetworkObject>();
                 networkObj.SpawnAsPlayerObject(player.Value.ClientId, true);
                 networkObj.ChangeOwnership(player.Value.ClientId);
-                var playerController = playerObject.GetComponent<PlayerUiController>();
+                var playerController = playerObject.GetComponentInChildren<PlayerUiController>();
                 playerController.SetNameClientRpc(player.Value.PlayerName);
                 _nextPointIndex++;
             }

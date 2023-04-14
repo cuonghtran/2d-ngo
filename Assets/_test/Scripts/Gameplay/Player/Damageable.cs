@@ -10,7 +10,8 @@ namespace BasicNetcode
     {
         public struct DamageMessage
         {
-            public MonoBehaviour damager;
+            public GameObject damager;
+            public string sourcePlayer;
             public float amount;
             public Vector3 direction;
             public float knockBackForce;
@@ -22,63 +23,48 @@ namespace BasicNetcode
         [SerializeField] private PlayerUiController _playerUiController;
 
         [Header("Events")]
-        [SerializeField] private FloatEventChannelSo _onDamageReceivedEvent;
+        [SerializeField] private HitPointsEventChannelSo _onHitPointsChanged;
 
-        public float maxHitPoints;
-        public float currentHitPoints { get; set; }
+        public float maxHealth;
+        public float currentHealth { get; private set; }
         public float maxArmor;
-        public float currentArmor { get; set; }
-        public float invulnerabilityTime = 0.25f;
-        public bool isInvulnerable { get; set; }
-
-        public UnityEvent OnDeath, OnReceiveDamage, OnBecomeVulnerable, OnResetDamage;
-
-        [Tooltip("When this gameObject is damaged, these other gameObjects are notified.")]
-        public List<MonoBehaviour> onDamageMessageReceivers;
-
+        public float currentArmor { get; private set; }
+        public bool isInvulnerable;
+        private float invulnerabilityTime = 0.25f;
         protected float _timeSinceLastHit = 0.0f;
         protected Collider _collider;
-
-        System.Action schedule;
 
         // Start is called before the first frame update
         void Start()
         {
-            ResetDamage();
             _collider = GetComponent<Collider>();
         }
 
+        private void OnEnable()
+        {
+            ResetDamageable();
+        }
+
         // Update is called once per frame
-        void Update()
-        {
-            if (isInvulnerable)
-            {
-                _timeSinceLastHit += Time.deltaTime;
-                if (_timeSinceLastHit > invulnerabilityTime)
-                {
-                    _timeSinceLastHit = 0.0f;
-                    isInvulnerable = false;
-                    OnBecomeVulnerable.Invoke();
-                }
-            }
-        }
+        // void Update()
+        // {
+        //     if (isInvulnerable)
+        //     {
+        //         _timeSinceLastHit += Time.deltaTime;
+        //         if (_timeSinceLastHit > invulnerabilityTime)
+        //         {
+        //             _timeSinceLastHit = 0.0f;
+        //             isInvulnerable = false;
+        //         }
+        //     }
+        // }
 
-        void LateUpdate()
+        public void ResetDamageable()
         {
-            if (schedule != null)
-            {
-                schedule();
-                schedule = null;
-            }
-        }
-
-        public void ResetDamage()
-        {
-            currentHitPoints = maxHitPoints;
+            currentHealth = maxHealth;
             currentArmor = maxArmor;
             isInvulnerable = false;
             _timeSinceLastHit = 0f;
-            OnResetDamage.Invoke();
         }
 
         public void SetColliderState(bool enabled)
@@ -89,34 +75,25 @@ namespace BasicNetcode
         public void ApplyDamage(DamageMessage data)
         {
             // already dead or invulnerable
-            if (currentHitPoints <= 0 || isInvulnerable)
+            if (currentHealth <= 0 || isInvulnerable)
                 return;
 
-            isInvulnerable = true;  // enable this line if want to make player invul after getting hit.
             CalculateDamageDone(data.amount);
-
-            if (currentHitPoints <= 0)
-                schedule += OnDeath.Invoke;
-            else OnReceiveDamage.Invoke();
-
-            var messageType = currentHitPoints <= 0 ? MessageType.DEAD : MessageType.DAMAGED;
-
-            for (var i = 0; i < onDamageMessageReceivers.Count; ++i)
-            {
-                var receiver = onDamageMessageReceivers[i] as IMessageReceiver;
-                receiver.OnReceiveMessage(messageType, this, data);
-            }
         }
 
         void CalculateDamageDone(float amount)
         {
-            currentArmor -= amount;
-            if (currentArmor < 0) // when the dmg is greater than current armor
+            if (amount <= currentArmor)  // when the damage is less than current armor
             {
-                amount = Mathf.Abs(currentArmor); // save the leftover dmg
-                currentArmor = 0;
-                currentHitPoints -= amount;
+                currentArmor = Mathf.Max(currentArmor - amount, 0);
             }
+            else  // when the damage is greater than current armor
+            {
+                float leftAmt = Mathf.Abs(currentArmor - amount);
+                currentArmor = 0;
+                currentHealth = Mathf.Max(currentHealth - leftAmt, 0);
+            }
+            _onHitPointsChanged.RaiseEvent(currentHealth, currentArmor);
         }
     }
 

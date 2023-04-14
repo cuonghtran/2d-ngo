@@ -13,7 +13,7 @@ namespace BasicNetcode
         [SerializeField] private float lifeTime = 1f;
         [Range(0.1f, 1f)]
         [SerializeField] private float size = 0.2f;
-        [Range(0.5f, 25f)]
+        [Range(0.2f, 25f)]
         [SerializeField] private float spreadAngle = 1f;
         [Range(5f, 50f)]
         [SerializeField] private float damageAmount = 5f;
@@ -78,7 +78,8 @@ namespace BasicNetcode
 
             var msg = new Damageable.DamageMessage()
             {
-                damager = this,
+                damager = gameObject,
+                sourcePlayer = _playerOwner,
                 amount = damageAmount,
                 direction = other.transform.position - transform.position,
                 stopCamera = false

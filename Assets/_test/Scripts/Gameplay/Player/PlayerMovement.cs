@@ -39,8 +39,8 @@ namespace BasicNetcode
             _renderer = transform.GetComponent<SpriteRenderer>();
             _networkTransform = GetComponent<NetworkTransform>();
             _damageable = GetComponent<Damageable>();
-            _damageable.onDamageMessageReceivers.Add(this);
-            _damageable.isInvulnerable = true;
+            // _damageable.onDamageMessageReceivers.Add(this);
+            // _damageable.isInvulnerable = true;
         }
 
         // Update is called once per frame
@@ -105,18 +105,18 @@ namespace BasicNetcode
             UpdateClientMovementServerRpc(_movementDirection, _movementSpeed, _moveState, _rollSpeed);
 
             // TEST DAMAGE
-            //if (Input.GetKeyDown(KeyCode.V))
-            //{
-            //    var d = transform.GetComponent<Damageable>();
-            //    var msg = new Damageable.DamageMessage()
-            //    {
-            //        damager = this,
-            //        amount = 35,
-            //        direction = Vector3.up,
-            //        stopCamera = false
-            //    };
-            //    d.ApplyDamage(msg);
-            //}
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+               var d = transform.GetComponent<Damageable>();
+               var msg = new Damageable.DamageMessage()
+               {
+                   damager = gameObject,
+                   amount = 35,
+                   direction = Vector3.up,
+                   stopCamera = false
+               };
+               d.ApplyDamage(msg);
+            }
         }
 
         [ServerRpc]

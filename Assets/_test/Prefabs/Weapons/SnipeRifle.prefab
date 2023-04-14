@@ -5062,7 +5062,7 @@ MonoBehaviour:
   ammoCount: 0
   clipSize: 10
   fireRate: 1.6
-  reloadTime: 1.25
+  reloadTime: 1.4
   playerOwner: 
   bulletParticle: {fileID: 7639574128006971985}
 --- !u!1 &7413817516950974727
@@ -9985,10 +9985,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43853f88486d04b26b256f4e9d5c0afd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 28
-  lifeTime: 0.8
+  speed: 30
+  lifeTime: 0.75
   size: 0.3
-  spreadAngle: 0.65
+  spreadAngle: 0.5
   damageAmount: 40
   isBurstWeapon: 0
   bulletForWeapon: {fileID: 0}

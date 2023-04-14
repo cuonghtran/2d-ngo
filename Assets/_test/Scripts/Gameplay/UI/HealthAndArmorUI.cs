@@ -31,7 +31,7 @@ namespace BasicNetcode
         IEnumerator UpdateHpAndArmor(Damageable damageable)
         {
             float armorPercentage = damageable.currentArmor / damageable.maxArmor;
-            float hpPercentage = damageable.currentHitPoints / damageable.maxHitPoints;
+            float hpPercentage = damageable.currentHealth / damageable.maxHealth;
 
             yield return StartCoroutine(UpdateArmorSequence(armorPercentage));
             StartCoroutine(UpdateHitPointSequence(hpPercentage));

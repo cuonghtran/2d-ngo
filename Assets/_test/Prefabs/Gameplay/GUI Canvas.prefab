@@ -2169,7 +2169,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c06e6764496b7d44d9965f7f2dde1866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BigAmmoMag_Text: {fileID: 5035869345749811011}
+  _textAmmoCount: {fileID: 5035869345749811011}
+  _healthFillImage: {fileID: 8457644827403828497}
+  _armorFillImage: {fileID: 8457644826654073578}
+  _onPlayerHitPointsChanged: {fileID: 11400000, guid: ae83fd70b81e7c0469d7c83a6cf4e306, type: 2}
 --- !u!1 &8457644827403828499
 GameObject:
   m_ObjectHideFlags: 0

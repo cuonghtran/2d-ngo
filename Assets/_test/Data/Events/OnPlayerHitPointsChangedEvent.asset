@@ -9,6 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f67f7302ad3b304bab3ea3fe0a00673, type: 3}
-  m_Name: OnDamageReceivedEvent
+  m_Script: {fileID: 11500000, guid: f10bfbafb58052549ab7480c4002e407, type: 3}
+  m_Name: OnPlayerHitPointsChangedEvent
   m_EditorClassIdentifier: 
