@@ -14,7 +14,19 @@ namespace BasicNetcode
         public override void OnNetworkSpawn()
         {
             if (IsLocalPlayer)
+            {
                 _mainCamera = Camera.main;
+                _mainCamera.transform.SetParent(transform);
+                _mainCamera.transform.localPosition = new Vector3(0f, 0f, -10f);
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (IsLocalPlayer && _mainCamera != null)
+            {
+                _mainCamera.transform.SetParent(null);
+            }
         }
 
         // Update is called once per frame

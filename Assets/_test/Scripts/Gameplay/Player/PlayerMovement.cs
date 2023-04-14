@@ -84,7 +84,7 @@ namespace BasicNetcode
                     _movementSpeed = Mathf.Clamp(_movementDirection.sqrMagnitude, 0f, 1f);
                     _movementDirection.Normalize();
 
-                    if (Input.GetKeyDown(KeyCode.LeftShift))
+                    if (Input.GetKeyDown(KeyCode.LeftShift) && _movementSpeed > 0)
                     {
                         _rollSpeed = _speed * 5; // starting value of roll speed
                         _animator.SetBool("IsRolling", true);

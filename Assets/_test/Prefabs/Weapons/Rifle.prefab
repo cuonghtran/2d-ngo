@@ -14831,7 +14831,7 @@ MonoBehaviour:
   rarity: 0
   ammoCount: 0
   clipSize: 30
-  fireRate: 10
+  fireRate: 9
   reloadTime: 0.9
   playerOwner: 
   bulletParticle: {fileID: 4427444988556312437}
