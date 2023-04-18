@@ -11,7 +11,7 @@ namespace BasicNetcode
 
         private void Start()
         {
-            PlayerPrefs.GetString("PlayerName");
+            displayNameInputField.text = PlayerPrefs.GetString("PlayerName", "");
         }
 
         public void OnHostClicked()

@@ -475,9 +475,10 @@ MonoBehaviour:
   activeWeapon: {fileID: 6115553704709718258}
   activeWeaponIndex: 2
   _knifeAnimator: {fileID: 543309792370941852}
-  _onWeaponChangedEvent: {fileID: 11400000, guid: 2cf7f5deed389894b9f9125064268026, type: 2}
-  _onWeaponPickedupEvent: {fileID: 11400000, guid: d0151f519040a364b88470fef6572414, type: 2}
-  _onWeaponReloadingEvent: {fileID: 11400000, guid: c28e11f05b4a86f4b8c7df626474bb59, type: 2}
+  _onWeaponChanged: {fileID: 11400000, guid: 2cf7f5deed389894b9f9125064268026, type: 2}
+  _onWeaponPickedup: {fileID: 11400000, guid: d0151f519040a364b88470fef6572414, type: 2}
+  _onWeaponReloading: {fileID: 11400000, guid: c28e11f05b4a86f4b8c7df626474bb59, type: 2}
+  _onAmmoChanged: {fileID: 11400000, guid: 3a3bbc53db2e1c249901c6f0819aaebd, type: 2}
 --- !u!114 &543309792840402379
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1341,7 +1342,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reloadFillImage: {fileID: 100077983473850409}
-  _onWeaponReloadingEvent: {fileID: 11400000, guid: c28e11f05b4a86f4b8c7df626474bb59, type: 2}
+  _onWeaponReloading: {fileID: 11400000, guid: c28e11f05b4a86f4b8c7df626474bb59, type: 2}
 --- !u!1 &7767160571872178904
 GameObject:
   m_ObjectHideFlags: 0

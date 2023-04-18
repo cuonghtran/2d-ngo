@@ -5,8 +5,8 @@ namespace BasicNetcode
 {
     public class WeaponSlotsUI : MonoBehaviour
     {
-        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChangedEvent;
-        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedupEvent;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChanged;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedup;
 
         float _transitionTime = 0.15f;
         float _activateAlpha = 0.85f;
@@ -16,14 +16,14 @@ namespace BasicNetcode
 
         private void OnEnable()
         {
-            _onWeaponChangedEvent.OnEventRaised += UpdateActiveSlotUI;
-            _onWeaponPickedupEvent.OnEventRaised += UpdateActiveSlotWhenPickupUI;
+            _onWeaponChanged.OnEventRaised += UpdateActiveSlotUI;
+            _onWeaponPickedup.OnEventRaised += UpdateActiveSlotWhenPickupUI;
         }
 
         private void OnDisable()
         {
-            _onWeaponChangedEvent.OnEventRaised -= UpdateActiveSlotUI;
-            _onWeaponPickedupEvent.OnEventRaised -= UpdateActiveSlotWhenPickupUI;
+            _onWeaponChanged.OnEventRaised -= UpdateActiveSlotUI;
+            _onWeaponPickedup.OnEventRaised -= UpdateActiveSlotWhenPickupUI;
         }
 
         private Weapon[] equippedWeapons = new Weapon[3];

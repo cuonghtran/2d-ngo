@@ -9,7 +9,7 @@ namespace BasicNetcode
         [SerializeField] private Image reloadFillImage;
 
         [Header("Events")]
-        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloadingEvent;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloading;
 
         private CanvasGroup canvasGroup;
 
@@ -20,12 +20,12 @@ namespace BasicNetcode
 
         private void OnEnable()
         {
-            _onWeaponReloadingEvent.OnEventRaised += ReloadWeaponUI;
+            _onWeaponReloading.OnEventRaised += ReloadWeaponUI;
         }
 
         private void OnDisable()
         {
-            _onWeaponReloadingEvent.OnEventRaised -= ReloadWeaponUI;
+            _onWeaponReloading.OnEventRaised -= ReloadWeaponUI;
         }
 
         private void ReloadWeaponUI(PlayerWeapons playerWeapons)

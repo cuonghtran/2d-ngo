@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using BasicNetcode.Message;
+using Unity.Netcode;
 
 namespace BasicNetcode
 {
-    public class Damageable : MonoBehaviour
+    public class Damageable : NetworkBehaviour
     {
         public struct DamageMessage
         {
@@ -79,11 +80,12 @@ namespace BasicNetcode
             if (currentHealth <= 0 || isInvulnerable)
                 return;
 
-            CalculateDamageDone(data.amount);
+            CalculateDamageDoneServerRpc(data.amount);
             TargetShowDamagePopupText(data.amount);
         }
 
-        private void CalculateDamageDone(float amount)
+        [ServerRpc]
+        private void CalculateDamageDoneServerRpc(float amount)
         {
             if (amount <= currentArmor)  // when the damage is less than current armor
             {
@@ -96,6 +98,12 @@ namespace BasicNetcode
                 currentHealth = Mathf.Max(currentHealth - leftAmt, 0);
             }
             _onHitPointsChanged.RaiseEvent(currentHealth, currentArmor);
+        }
+
+        [ClientRpc]
+        private void UpdateClientHitPointsClientRpc()
+        {
+
         }
 
         private void TargetShowDamagePopupText(float dmg)

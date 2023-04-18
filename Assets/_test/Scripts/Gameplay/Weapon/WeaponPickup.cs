@@ -51,12 +51,6 @@ namespace BasicNetcode
             }
         }
 
-        IEnumerator SwitchDirection()
-        {
-            yield return new WaitForSeconds(0.15f);
-            goingForward = !goingForward;
-        }
-
         private void OnTriggerEnter2D(Collider2D collision)
         {
             if (collision.CompareTag("Player"))
@@ -64,6 +58,16 @@ namespace BasicNetcode
                 InteractCanvas.SetActive(true);
                 isTriggered = true;
                 triggerTransform = collision.transform;
+            }
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            if (collision.CompareTag("Player"))
+            {
+                InteractCanvas.SetActive(false);
+                isTriggered = false;
+                triggerTransform = null;
             }
         }
 
@@ -79,17 +83,7 @@ namespace BasicNetcode
                 Destroy(gameObject);
             }
         }
-
-        private void OnTriggerExit2D(Collider2D collision)
-        {
-            if (collision.CompareTag("Player"))
-            {
-                InteractCanvas.SetActive(false);
-                isTriggered = false;
-                triggerTransform = null;
-            }
-        }
-
+        
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {

@@ -11,21 +11,11 @@ namespace BasicNetcode
         private Vector3 mousePosition = Vector3.zero;
         private Camera _mainCamera;
 
-        public override void OnNetworkSpawn()
+        private void Start()
         {
-            if (IsLocalPlayer)
+            if (IsOwner)
             {
                 _mainCamera = Camera.main;
-                _mainCamera.transform.SetParent(transform);
-                _mainCamera.transform.localPosition = new Vector3(0f, 0f, -10f);
-            }
-        }
-
-        private void OnDisable()
-        {
-            if (IsLocalPlayer && _mainCamera != null)
-            {
-                _mainCamera.transform.SetParent(null);
             }
         }
 

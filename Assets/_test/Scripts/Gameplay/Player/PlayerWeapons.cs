@@ -23,9 +23,10 @@ namespace BasicNetcode
         [SerializeField] private Animator _knifeAnimator;
 
         [Header("Events")]
-        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChangedEvent;
-        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedupEvent;
-        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloadingEvent;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChanged;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedup;
+        [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloading;
+        [SerializeField] private IntEventChannelSo _onAmmoChanged;
 
         private bool _onCooldown;
         private string _knifeWeaponName = "Knife";
@@ -41,13 +42,16 @@ namespace BasicNetcode
             if (activeWeapon)
             {
                 Equip(activeWeapon, false);
-                _onWeaponPickedupEvent.RaiseEvent(this);
+                _onWeaponPickedup.RaiseEvent(this);
             }
         }
 
         // Update is called once per frame
         void Update()
         {
+            if (!IsLocalPlayer)
+                return;
+
             ChangeWeapon();
             StartCoroutine(ReloadActiveWeapon());
             FireWeapon();
@@ -58,26 +62,32 @@ namespace BasicNetcode
             if (!activeWeapon.IsReloading)
             {
                 if (Input.GetKeyDown(KeyCode.Alpha1))
-                    SetActiveWeapon(WeaponSlot.First, false);
+                {
+                    ChangeActiveWeapon(WeaponSlot.First, false);
+                }
 
                 if (Input.GetKeyDown(KeyCode.Alpha2))
-                    SetActiveWeapon(WeaponSlot.Second, false);
+                {
+                    ChangeActiveWeapon(WeaponSlot.Second, false);
+                }
 
                 if (Input.GetKeyDown(KeyCode.Alpha3))
-                    SetActiveWeapon(WeaponSlot.Third, false);
+                {
+                    ChangeActiveWeapon(WeaponSlot.Third, false);
+                }
             }
         }
 
         private void FireWeapon()
         {
-            if (activeWeapon && !_onCooldown && !activeWeapon.IsReloading)
+            if (Input.GetMouseButton(0))
             {
-                if (Input.GetMouseButton(0))
+                if (activeWeapon && !_onCooldown && !activeWeapon.IsReloading)
                 {
                     if (activeWeapon.slot == WeaponSlot.Third && activeWeapon.name == _knifeWeaponName)
                     {
-                        _knifeAnimator.SetTrigger(_hashKnifeAttack);
-                        StartCoroutine(ReloadKnife());
+                        _onCooldown = true;
+                        RequestToUseKnifeServerRpc();
                     }
                     else
                     {
@@ -85,12 +95,37 @@ namespace BasicNetcode
                         {
                             _weaponCooldownTime = Time.time + activeWeapon.WeaponCooldown;
                             activeWeapon.ReduceAmmo();
-                            GUIManager.Instance.UpdateAmmoUI(activeWeapon.AmmoCount);
-                            activeWeapon.OnFireBullets();
+                            _onAmmoChanged.RaiseEvent(activeWeapon.AmmoCount);
+                            RequestToShootServerRpc();
                         }
                     }
                 }
             }
+        }
+
+        [ServerRpc]
+        private void RequestToUseKnifeServerRpc()
+        {
+            UseKnifeClientRpc();
+        }
+
+        [ClientRpc]
+        private void UseKnifeClientRpc()
+        {
+            _knifeAnimator.SetTrigger(_hashKnifeAttack);
+            StartCoroutine(ReloadKnife());
+        }
+
+        [ServerRpc]
+        private void RequestToShootServerRpc()
+        {
+            ShootClientRpc();
+        }
+
+        [ClientRpc]
+        private void ShootClientRpc()
+        {
+            activeWeapon.OnFireBullets();
         }
 
         IEnumerator ReloadActiveWeapon()
@@ -99,17 +134,15 @@ namespace BasicNetcode
             {
                 if (activeWeapon.slot != WeaponSlot.Third) // don't reload third weapons
                 {
-                    _onWeaponReloadingEvent.RaiseEvent(this);
+                    _onWeaponReloading.RaiseEvent(this);
                     yield return StartCoroutine(activeWeapon.Reload());
-                    GUIManager.Instance.UpdateAmmoUI(activeWeapon.AmmoCount);
+                    _onAmmoChanged.RaiseEvent(activeWeapon.AmmoCount);
                 }
             }
         }
 
         IEnumerator ReloadKnife()
         {
-            _onCooldown = true;
-
             float elapsedTime = 0;
             while (elapsedTime <= _knifeCooldown)
             {
@@ -144,10 +177,10 @@ namespace BasicNetcode
             weapon.ChangeColorByRarity((int)newWeapon.rarity);
             equippedWeapons[weaponSlotIndex] = weapon;
 
-            SetActiveWeapon(newWeapon.slot, isPickup);
+            ChangeActiveWeapon(newWeapon.slot, isPickup);
         }
 
-        void SetActiveWeapon(WeaponSlot weaponSlot, bool isPickup)
+        void ChangeActiveWeapon(WeaponSlot weaponSlot, bool isPickup)
         {
             if (equippedWeapons[(int)weaponSlot] == null)
                 return;
@@ -180,7 +213,7 @@ namespace BasicNetcode
                 weapon.gameObject.SetActive(true);
                 yield return new WaitForSeconds(0.05f);
                 _onCooldown = false;
-                GUIManager.Instance.UpdateAmmoUI(weapon.AmmoCount);
+                _onAmmoChanged.RaiseEvent(weapon.AmmoCount);
             }
         }
 
@@ -190,8 +223,8 @@ namespace BasicNetcode
             yield return StartCoroutine(ActivateWeapon(activateIndex));
             activeWeaponIndex = activateIndex;
             if (isPickup)
-                _onWeaponPickedupEvent.RaiseEvent(this);
-            else _onWeaponChangedEvent.RaiseEvent(this);
+                _onWeaponPickedup.RaiseEvent(this);
+            else _onWeaponChanged.RaiseEvent(this);
         }
     }
 }

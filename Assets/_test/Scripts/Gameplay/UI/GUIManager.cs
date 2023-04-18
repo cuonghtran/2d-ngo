@@ -16,6 +16,7 @@ namespace BasicNetcode
 
         [Header("Events")]
         [SerializeField] private HitPointsEventChannelSo _onPlayerHitPointsChanged;
+        [SerializeField] private IntEventChannelSo _onAmmoChanged;
 
         private float _updateSpeed = 0.13f;
         private const float MAX_CHARACTER_HEALTH = 100;
@@ -30,11 +31,13 @@ namespace BasicNetcode
         private void OnEnable()
         {
             _onPlayerHitPointsChanged.OnEventRaised += UpdatePlayerUi;
+            _onAmmoChanged.OnEventRaised += UpdateAmmoUI;
         }
 
         private void OnDisable()
         {
             _onPlayerHitPointsChanged.OnEventRaised -= UpdatePlayerUi;
+            _onAmmoChanged.OnEventRaised -= UpdateAmmoUI;
         }
 
         private void UpdatePlayerUi(float newHealthValue, float newArmorValue)
@@ -74,7 +77,7 @@ namespace BasicNetcode
             }
         }
 
-        public void UpdateAmmoUI(int ammo)
+        private void UpdateAmmoUI(int ammo)
         {
             _textAmmoCount.text = ammo.ToString();
         }

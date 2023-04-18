@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace BasicNetcode
 {
-    public class BulletParticle : MonoBehaviour
+    public class BulletParticle : NetworkBehaviour
     {
         [Header("Bullet Properties")]
         [Range(10, 40)]
@@ -57,6 +58,8 @@ namespace BasicNetcode
 
         void OnParticleCollision(GameObject other)
         {
+            if (!IsServer) return;
+            
             int numCollisionEvents = _particleSystem.GetCollisionEvents(other, collisionEvents);
 
             for (int i = 0; i < numCollisionEvents; i++)

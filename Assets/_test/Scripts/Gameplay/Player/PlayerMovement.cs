@@ -2,6 +2,8 @@ using UnityEngine;
 using BasicNetcode.Message;
 using Unity.Netcode;
 using Unity.Netcode.Components;
+using Cinemachine;
+using System;
 
 namespace BasicNetcode
 {
@@ -31,6 +33,8 @@ namespace BasicNetcode
         private int _hashVertical = Animator.StringToHash("Vertical");
         private int _hashSpeed = Animator.StringToHash("Speed");
 
+        public event Action<GameObject> OnPressedInteract;
+
         public override void OnNetworkSpawn()
         {
             _rigidBody = GetComponent<Rigidbody2D>();
@@ -41,6 +45,7 @@ namespace BasicNetcode
             _damageable = GetComponent<Damageable>();
             // _damageable.onDamageMessageReceivers.Add(this);
             // _damageable.isInvulnerable = true;
+            
         }
 
         // Update is called once per frame
@@ -49,6 +54,7 @@ namespace BasicNetcode
             if (!IsLocalPlayer)
                 return;
 
+            // Interact();
             MovementHandler();
             Animate();
         }
@@ -116,6 +122,14 @@ namespace BasicNetcode
                    stopCamera = false
                };
                d.ApplyDamage(msg);
+            }
+        }
+
+        private void Interact()
+        {
+            if (Input.GetKeyDown(KeyCode.E) && OnPressedInteract != null)
+            {
+                OnPressedInteract.Invoke(gameObject);
             }
         }
 
