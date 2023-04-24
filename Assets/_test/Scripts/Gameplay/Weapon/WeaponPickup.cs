@@ -1,10 +1,11 @@
 using System.Collections;
 using UnityEngine;
 using System.Linq;
+using Unity.Netcode;
 
 namespace BasicNetcode
 {
-    public class WeaponPickup : MonoBehaviour
+    public class WeaponPickup : NetworkBehaviour
     {
         [Header("References")]
         [SerializeField] private Weapon weaponToBePickedUp;
@@ -83,6 +84,8 @@ namespace BasicNetcode
                 Destroy(gameObject);
             }
         }
+
+        
         
 #if UNITY_EDITOR
         private void OnDrawGizmos()

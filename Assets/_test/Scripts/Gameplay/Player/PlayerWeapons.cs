@@ -34,14 +34,11 @@ namespace BasicNetcode
         private float _weaponCooldownTime = 0f;
         private int _hashKnifeAttack = Animator.StringToHash("Knife_Attack");
 
-        public static Action<int> OnAmmoChanged;
-
         // Start is called before the first frame update
         void Start()
         {
             if (activeWeapon)
             {
-                Equip(activeWeapon, false);
                 _onWeaponPickedup.RaiseEvent(this);
             }
         }
@@ -63,17 +60,17 @@ namespace BasicNetcode
             {
                 if (Input.GetKeyDown(KeyCode.Alpha1))
                 {
-                    ChangeActiveWeapon(WeaponSlot.First, false);
+                    ChangeActiveWeapon((int)WeaponSlot.First, false);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha2))
                 {
-                    ChangeActiveWeapon(WeaponSlot.Second, false);
+                    ChangeActiveWeapon((int)WeaponSlot.Second, false);
                 }
 
                 if (Input.GetKeyDown(KeyCode.Alpha3))
                 {
-                    ChangeActiveWeapon(WeaponSlot.Third, false);
+                    ChangeActiveWeapon((int)WeaponSlot.Third, false);
                 }
             }
         }
@@ -177,31 +174,56 @@ namespace BasicNetcode
             weapon.ChangeColorByRarity((int)newWeapon.rarity);
             equippedWeapons[weaponSlotIndex] = weapon;
 
-            ChangeActiveWeapon(newWeapon.slot, isPickup);
+            ChangeActiveWeapon(weaponSlotIndex, isPickup);
         }
 
-        void ChangeActiveWeapon(WeaponSlot weaponSlot, bool isPickup)
+        void ChangeActiveWeapon(int newWeaponIndex, bool isPickup)
         {
-            if (equippedWeapons[(int)weaponSlot] == null)
+            ServerRpcParams rpcParams = new ServerRpcParams
+            {
+                Receive = new ServerRpcReceiveParams
+                {
+                    SenderClientId = OwnerClientId
+                }
+            };
+            RequestChangeWeaponServerRpc(newWeaponIndex, isPickup, rpcParams);
+        }
+
+        [ServerRpc]
+        private void RequestChangeWeaponServerRpc(int newWeaponIndex, bool isPickup, ServerRpcParams rpcParams)
+        {
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams
+                {
+                    TargetClientIds = new ulong[] { rpcParams.Receive.SenderClientId }
+                }
+            };
+
+            UpdateClientWeaponClientRpc(newWeaponIndex, isPickup, clientRpcParams);
+        }
+
+        [ClientRpc]
+        private void UpdateClientWeaponClientRpc(int newWeaponIndex, bool isPickup, ClientRpcParams rpcParams = default)
+        {
+            if (activeWeaponIndex == newWeaponIndex || equippedWeapons[newWeaponIndex] == null)
                 return;
 
             int holsterIndex = activeWeaponIndex;
-            int activateIndex = (int)weaponSlot;
-            if (holsterIndex != activateIndex) // only switch different weapons
+            if (holsterIndex != newWeaponIndex) // only switch different weapons
             {
-                StartCoroutine(SwitchWeapon(holsterIndex, activateIndex, isPickup));
+                StartCoroutine(SwitchWeapon(newWeaponIndex, isPickup));
             }
         }
 
-        IEnumerator HolsterWeapon(int index)
+        IEnumerator HolsterCurrentWeapon()
         {
             _onCooldown = true;
-            var weapon = GetWeaponByIndex(index);
-            if (weapon)
+            foreach (Weapon wp in equippedWeapons)
             {
-                weapon.gameObject.SetActive(false);
-                yield return new WaitForSeconds(0.1f);
+                if (wp != null) wp.gameObject.SetActive(false);
             }
+            yield return new WaitForSeconds(0.05f);
         }
 
         IEnumerator ActivateWeapon(int index)
@@ -217,9 +239,9 @@ namespace BasicNetcode
             }
         }
 
-        IEnumerator SwitchWeapon(int currentIndex, int activateIndex, bool isPickup)
+        IEnumerator SwitchWeapon(int activateIndex, bool isPickup)
         {
-            yield return StartCoroutine(HolsterWeapon(currentIndex));
+            yield return StartCoroutine(HolsterCurrentWeapon());
             yield return StartCoroutine(ActivateWeapon(activateIndex));
             activeWeaponIndex = activateIndex;
             if (isPickup)

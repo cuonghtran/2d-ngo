@@ -33,7 +33,7 @@ namespace BasicNetcode
         private int _hashVertical = Animator.StringToHash("Vertical");
         private int _hashSpeed = Animator.StringToHash("Speed");
 
-        public event Action<GameObject> OnPressedInteract;
+        public event Action<GameObject> OnInteractKeyPressed;
 
         public override void OnNetworkSpawn()
         {
@@ -127,9 +127,9 @@ namespace BasicNetcode
 
         private void Interact()
         {
-            if (Input.GetKeyDown(KeyCode.E) && OnPressedInteract != null)
+            if (Input.GetKeyDown(KeyCode.E) && OnInteractKeyPressed != null)
             {
-                OnPressedInteract.Invoke(gameObject);
+                OnInteractKeyPressed.Invoke(gameObject);
             }
         }
 

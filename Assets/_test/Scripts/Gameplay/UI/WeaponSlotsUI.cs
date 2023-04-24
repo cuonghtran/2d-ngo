@@ -8,7 +8,7 @@ namespace BasicNetcode
         [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponChanged;
         [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponPickedup;
 
-        float _transitionTime = 0.15f;
+        float _transitionTime = 0.1f;
         float _activateAlpha = 0.85f;
         float _deactivateAlpha = 0.6f;
         float _originPosY = 0;
