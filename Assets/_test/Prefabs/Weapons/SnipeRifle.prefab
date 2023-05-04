@@ -4968,6 +4968,7 @@ GameObject:
   - component: {fileID: 9190983666402074814}
   - component: {fileID: 5474444042291679940}
   - component: {fileID: 1976824296200704314}
+  - component: {fileID: 2977385479350116561}
   m_Layer: 0
   m_Name: SnipeRifle
   m_TagString: Untagged
@@ -5012,7 +5013,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5065,6 +5066,22 @@ MonoBehaviour:
   reloadTime: 1.7
   playerOwner: 
   bulletParticle: {fileID: 7639574128006971985}
+--- !u!114 &2977385479350116561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6095750508147029990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &7413817516950974727
 GameObject:
   m_ObjectHideFlags: 0

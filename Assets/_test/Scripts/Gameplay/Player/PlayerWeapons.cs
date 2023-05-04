@@ -28,6 +28,14 @@ namespace BasicNetcode
         [SerializeField] private PlayerWeaponsEventChannelSo _onWeaponReloading;
         [SerializeField] private IntEventChannelSo _onAmmoChanged;
 
+        private Weapon _weaponToBePickedUp;
+        public Weapon WeaponToBePickedUp 
+        { 
+            get { return _weaponToBePickedUp; }
+            set { _weaponToBePickedUp = value; }
+        }
+
+        private string _playerOwner;
         private bool _onCooldown;
         private string _knifeWeaponName = "Knife";
         private float _knifeCooldown = 0.5f;
@@ -37,7 +45,7 @@ namespace BasicNetcode
         // Start is called before the first frame update
         void Start()
         {
-            if (activeWeapon)
+            if (activeWeapon && IsOwner)
             {
                 _onWeaponPickedup.RaiseEvent(this);
             }
@@ -162,20 +170,20 @@ namespace BasicNetcode
             return GetWeaponByIndex(activeWeaponIndex);
         }
 
-        public void Equip(Weapon newWeapon, bool isPickup)
-        {
-            int weaponSlotIndex = (int)newWeapon.slot;
-            var weapon = GetWeaponByIndex(weaponSlotIndex);
-            if (weapon)
-                return; // do nothing if pickup an already owned weapon
+        // public void Equip(Weapon newWeapon, bool isPickup)
+        // {
+        //     int weaponSlotIndex = (int)newWeapon.slot;
+        //     var weapon = GetWeaponByIndex(weaponSlotIndex);
+        //     if (weapon)
+        //         return; // do nothing if pickup an already owned weapon
 
-            weapon = newWeapon;
-            weapon.transform.SetParent(_weaponSlots[weaponSlotIndex], false);
-            weapon.ChangeColorByRarity((int)newWeapon.rarity);
-            equippedWeapons[weaponSlotIndex] = weapon;
+        //     weapon = newWeapon;
+        //     weapon.transform.SetParent(_weaponSlots[weaponSlotIndex], false);
+        //     weapon.ChangeColorByRarity((int)newWeapon.rarity);
+        //     equippedWeapons[weaponSlotIndex] = weapon;
 
-            ChangeActiveWeapon(weaponSlotIndex, isPickup);
-        }
+        //     ChangeActiveWeapon(weaponSlotIndex, isPickup);
+        // }
 
         void ChangeActiveWeapon(int newWeaponIndex, bool isPickup)
         {
@@ -216,6 +224,36 @@ namespace BasicNetcode
             }
         }
 
+        public void PostPickUpHandler(Weapon newWeapon)
+        {
+            if (!IsClient) return;
+
+            int newWeaponIndex = (int)newWeapon.slot;
+            equippedWeapons[newWeaponIndex] = newWeapon;
+            newWeapon.transform.SetParent(_weaponSlots[newWeaponIndex], false);
+            newWeapon.playerOwner = _playerOwner;
+            newWeapon.SetUpOwner();
+
+            RequestActivatePickedUpWeaponServerRpc(newWeaponIndex);
+        }
+
+        [ServerRpc]
+        public void RequestActivatePickedUpWeaponServerRpc(int newWeaponIndex)
+        {
+            if (activeWeaponIndex == newWeaponIndex || equippedWeapons[newWeaponIndex] == null)
+                return;
+
+            activeWeaponIndex = newWeaponIndex;
+            _weaponCooldownTime = 0;
+            UpdatePickedUpWeaponClientRpc(newWeaponIndex);
+        }
+
+        [ClientRpc]
+        private void UpdatePickedUpWeaponClientRpc(int newWeaponIndex)
+        {
+            StartCoroutine(SwitchWeapon(newWeaponIndex, true));
+        }
+
         IEnumerator HolsterCurrentWeapon()
         {
             _onCooldown = true;
@@ -244,9 +282,14 @@ namespace BasicNetcode
             yield return StartCoroutine(HolsterCurrentWeapon());
             yield return StartCoroutine(ActivateWeapon(activateIndex));
             activeWeaponIndex = activateIndex;
-            if (isPickup)
-                _onWeaponPickedup.RaiseEvent(this);
-            else _onWeaponChanged.RaiseEvent(this);
+            if (IsOwner)
+            {
+                if (isPickup)
+                    _onWeaponPickedup.RaiseEvent(this);
+                else 
+                    _onWeaponChanged.RaiseEvent(this);
+            }
+            
         }
     }
 }

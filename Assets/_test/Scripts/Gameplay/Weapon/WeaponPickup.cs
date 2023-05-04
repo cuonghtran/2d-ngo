@@ -18,6 +18,7 @@ namespace BasicNetcode
         [SerializeField] private float frequency = 1f;
         private Vector2 tempPos = new Vector2();
 
+        private NetworkVariable<ulong> _targetClientId = new NetworkVariable<ulong>();
         private bool isTriggered = false;
         private bool isLooted = false;
         private Transform triggerTransform;
@@ -42,49 +43,97 @@ namespace BasicNetcode
             transform.position = tempPos;
 
             // a player in the trigger zone
-            if (isTriggered && !isLooted)
-            {
-                if (Input.GetKey(KeyCode.E))
-                {
-                    isLooted = true;
-                    PickUpWeapon(triggerTransform);
-                }
-            }
+            // if (isTriggered && !isLooted)
+            // {
+            //     if (Input.GetKey(KeyCode.E))
+            //     {
+            //         isLooted = true;
+            //         PickUpWeapon(triggerTransform);
+            //     }
+            // }
         }
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
+            if (!IsServer) return;
+
             if (collision.CompareTag("Player"))
             {
-                InteractCanvas.SetActive(true);
-                isTriggered = true;
-                triggerTransform = collision.transform;
+                _targetClientId.Value = collision.GetComponent<NetworkObject>().OwnerClientId;
+                ShowInteractUiClientRpc(true);
             }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
         {
+            if (!IsServer) return;
+
             if (collision.CompareTag("Player"))
             {
-                InteractCanvas.SetActive(false);
-                isTriggered = false;
-                triggerTransform = null;
+                _targetClientId.Value = collision.GetComponent<NetworkObject>().OwnerClientId;
+                ShowInteractUiClientRpc(false);
+                _targetClientId.Value = new ulong();
             }
         }
 
-        private void PickUpWeapon(Transform collision)
+        [ClientRpc]
+        private void ShowInteractUiClientRpc(bool isOn)
         {
-            PlayerWeapons playerWeapons = collision.GetComponent<PlayerWeapons>();
-            if (playerWeapons)
+            Logger.LogGreen($"target: {_targetClientId.Value}, local: {NetworkManager.Singleton.LocalClientId}");
+            if (_targetClientId.Value == NetworkManager.Singleton.LocalClientId)
             {
-                Weapon newWeapon = Instantiate(weaponToBePickedUp);
-                newWeapon.rarity = this.rarity;
-                newWeapon.FillAmmo();
-                playerWeapons.Equip(newWeapon, true);
-                Destroy(gameObject);
+                InteractCanvas.SetActive(isOn);
+                isTriggered = isOn;
+                if (isOn)
+                {
+                    NetworkManager.LocalClient.PlayerObject.GetComponent<PlayerMovement>().OnInteractKeyPressed += PlayerInteractionHandler;
+                }
+                else
+                {
+                    NetworkManager.LocalClient.PlayerObject.GetComponent<PlayerMovement>().OnInteractKeyPressed -= PlayerInteractionHandler;
+                }
             }
         }
 
+        private void PlayerInteractionHandler(GameObject interactPlayer)
+        {
+            if (isTriggered && !isLooted)
+            {
+                PlayerWeapons playerWeapons = interactPlayer.GetComponent<PlayerWeapons>();
+                isLooted = true;
+                playerWeapons.WeaponToBePickedUp = weaponToBePickedUp;
+                RequestPickupWeaponServerRpc();
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RequestPickupWeaponServerRpc()
+        {
+            isLooted = true;
+
+            var targetObject = NetworkManager.Singleton.ConnectedClients[_targetClientId.Value].PlayerObject;
+            Weapon newWeapon = Instantiate(weaponToBePickedUp, targetObject.transform);
+            newWeapon.rarity = this.rarity;
+            newWeapon.FillAmmo();
+            newWeapon.GetComponent<NetworkObject>().SpawnWithOwnership(_targetClientId.Value, true);
+
+            targetObject.GetComponent<PlayerWeapons>().PostPickUpHandler(newWeapon);
+            gameObject.GetComponent<NetworkObject>().Despawn();
+        }
+
+        // [ClientRpc]
+        // private void UpdatePickupClientRpc()
+        // {
+        //     if (_targetClientId.Value == NetworkManager.Singleton.LocalClientId)
+        //     {
+        //         var targetObject = NetworkManager.Singleton.ConnectedClients[_targetClientId.Value].PlayerObject;
+        //         Weapon newWeapon = Instantiate(weaponToBePickedUp, targetObject.transform);
+        //         newWeapon.rarity = this.rarity;
+        //         newWeapon.FillAmmo();
+        //         targetObject.GetComponent<PlayerWeapons>().PostPickUpHandler(newWeapon);
+        //         gameObject.GetComponent<NetworkObject>().Despawn();
+        //     }
+        // }
         
         
 #if UNITY_EDITOR

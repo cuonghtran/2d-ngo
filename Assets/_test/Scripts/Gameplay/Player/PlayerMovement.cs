@@ -54,7 +54,7 @@ namespace BasicNetcode
             if (!IsLocalPlayer)
                 return;
 
-            // Interact();
+            Interact();
             MovementHandler();
             Animate();
         }
@@ -129,6 +129,7 @@ namespace BasicNetcode
         {
             if (Input.GetKeyDown(KeyCode.E) && OnInteractKeyPressed != null)
             {
+                Logger.LogGreen("Client Interact");
                 OnInteractKeyPressed.Invoke(gameObject);
             }
         }

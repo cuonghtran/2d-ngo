@@ -28,7 +28,7 @@ namespace BasicNetcode
 
         private Weapon[] equippedWeapons = new Weapon[3];
 
-        public void UpdateActiveSlotUI(PlayerWeapons playerWeapons)
+        private void UpdateActiveSlotUI(PlayerWeapons playerWeapons)
         {
             int activeSlot = (int)playerWeapons.GetActiveWeapon().slot;
 
@@ -40,7 +40,7 @@ namespace BasicNetcode
             }
         }
 
-        public void UpdateActiveSlotWhenPickupUI(PlayerWeapons playerWeapons)
+        private void UpdateActiveSlotWhenPickupUI(PlayerWeapons playerWeapons)
         {
             equippedWeapons = playerWeapons.equippedWeapons;
             int activeSlot = (int)playerWeapons.GetActiveWeapon().slot;

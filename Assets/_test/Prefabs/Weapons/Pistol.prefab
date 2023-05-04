@@ -4909,6 +4909,7 @@ GameObject:
   - component: {fileID: 6795655106990999789}
   - component: {fileID: 5168132840759622589}
   - component: {fileID: 7767033535389627821}
+  - component: {fileID: 638392628279706269}
   m_Layer: 0
   m_Name: Pistol
   m_TagString: Untagged
@@ -4953,7 +4954,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5006,6 +5007,22 @@ MonoBehaviour:
   reloadTime: 0.6
   playerOwner: 
   bulletParticle: {fileID: 1325109969701760493}
+--- !u!114 &638392628279706269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272620747820086544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &2470237137478711974
 GameObject:
   m_ObjectHideFlags: 0
